@@ -3,6 +3,7 @@ package com.notepad.view;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.Component;
 
 /**
  * 富文本编辑器组件
@@ -32,15 +33,15 @@ public class EditorPane extends JTextArea {
 
     public void setModified(boolean modified) {
         this.isModified = modified;
-        if (!modified && getParent() != null && getParent().getParent() != null) {
-            updateTabTitle();
-        }
+        updateTabTitle();
     }
 
     // 初始化编辑器样式
     private void initEditorSettings() {
         setFont(new java.awt.Font("宋体", java.awt.Font.PLAIN, 14));
         setTabSize(4); // 设置Tab为4空格
+        setLineWrap(true); // 自动换行
+        setWrapStyleWord(true); // 按单词换行
     }
 
     // 监听文档修改状态
@@ -61,17 +62,30 @@ public class EditorPane extends JTextArea {
 
     private void updateTabTitle() {
         try {
-            javax.swing.JTabbedPane pane = (javax.swing.JTabbedPane) getParent().getParent().getParent();
-            int index = pane.indexOfComponent(getParent().getParent());
-            String title = pane.getTitleAt(index);
-    
-            if (isModified && !title.startsWith("*")) {
-                pane.setTitleAt(index, "*" + title);
-            } else if (!isModified && title.startsWith("*")) {
-                pane.setTitleAt(index, title.substring(1));
+            Component comp = this;
+            // 查找包含编辑器的 JTabbedPane
+            while (comp != null && !(comp.getParent() instanceof javax.swing.JTabbedPane)) {
+                comp = comp.getParent();
+            }
+            
+            if (comp != null) {
+                javax.swing.JTabbedPane pane = (javax.swing.JTabbedPane) comp.getParent();
+                int index = pane.indexOfComponent(comp);
+                
+                if (index != -1) {
+                    String title = pane.getTitleAt(index);
+                    
+                    // 如果是修改状态，添加星号
+                    if (isModified && !title.startsWith("*")) {
+                        pane.setTitleAt(index, "*" + title);
+                    } else if (!isModified && title.startsWith("*")) {
+                        pane.setTitleAt(index, title.substring(1));
+                    }
+                }
             }
         } catch (Exception e) {
             // 组件可能尚未添加到UI层次结构中
+            System.err.println("更新标签页标题失败: " + e.getMessage());
         }
     }
 }

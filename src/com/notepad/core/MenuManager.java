@@ -21,6 +21,7 @@ public class MenuManager {
     public MenuManager(MainFrame frame) {
         this.frame = frame;
         buildFileMenu();
+        buildEditMenu();
     }
 
     public JMenuBar getMenuBar() {
@@ -36,7 +37,7 @@ public class MenuManager {
                 
         // 打开菜单项
         addMenuItem(fileMenu, "打开", KeyEvent.VK_O,
-                e -> FileController.openFile(getCurrentEditor(), frame));
+                e -> FileController.openFile(frame));
 
         // 保存菜单项
         addMenuItem(fileMenu, "保存", KeyEvent.VK_S,
@@ -46,14 +47,52 @@ public class MenuManager {
         addMenuItem(fileMenu, "另存为...", KeyEvent.VK_A,
                 e -> FileController.saveAsFile(getCurrentEditor(), frame));
 
+        fileMenu.addSeparator();
+        
+        // 退出菜单项
+        addMenuItem(fileMenu, "退出", KeyEvent.VK_Q,
+                e -> frame.getTabManager().confirmExit());
+
         menuBar.add(fileMenu);
+    }
+    
+    private void buildEditMenu() {
+        JMenu editMenu = new JMenu("编辑");
+        
+        // 添加常见的编辑功能
+        addMenuItem(editMenu, "复制", KeyEvent.VK_C,
+                e -> {
+                    if (getCurrentEditor() != null) {
+                        getCurrentEditor().copy();
+                    }
+                });
+                
+        addMenuItem(editMenu, "剪切", KeyEvent.VK_X,
+                e -> {
+                    if (getCurrentEditor() != null) {
+                        getCurrentEditor().cut();
+                    }
+                });
+                
+        addMenuItem(editMenu, "粘贴", KeyEvent.VK_V,
+                e -> {
+                    if (getCurrentEditor() != null) {
+                        getCurrentEditor().paste();
+                    }
+                });
+                
+        menuBar.add(editMenu);
     }
 
     private EditorPane getCurrentEditor() {
-        javax.swing.JComponent tab = frame.getTabManager().getCurrentTab();
-        if (tab instanceof javax.swing.JPanel) {
-            javax.swing.JScrollPane scrollPane = (javax.swing.JScrollPane) ((javax.swing.JPanel) tab).getComponent(0);
-            return (EditorPane) scrollPane.getViewport().getView();
+        try {
+            javax.swing.JComponent tab = frame.getTabManager().getCurrentTab();
+            if (tab instanceof javax.swing.JPanel) {
+                javax.swing.JScrollPane scrollPane = (javax.swing.JScrollPane) ((javax.swing.JPanel) tab).getComponent(0);
+                return (EditorPane) scrollPane.getViewport().getView();
+            }
+        } catch (Exception e) {
+            System.err.println("获取当前编辑器失败: " + e.getMessage());
         }
         return null;
     }
