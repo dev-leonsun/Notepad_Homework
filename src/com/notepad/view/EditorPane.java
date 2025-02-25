@@ -16,13 +16,25 @@ public class EditorPane extends JTextArea {
         initEditorSettings();
         initDocumentListener();
     }
+    
     // getter和setter方法
     public java.io.File getCurrentFile() {
         return currentFile;
     }
 
+    public void setCurrentFile(java.io.File file) {
+        this.currentFile = file;
+    }
+
+    public boolean isModified() {
+        return isModified;
+    }
+
     public void setModified(boolean modified) {
-        isModified = modified;
+        this.isModified = modified;
+        if (!modified && getParent() != null && getParent().getParent() != null) {
+            updateTabTitle();
+        }
     }
 
     // 初始化编辑器样式
@@ -48,13 +60,18 @@ public class EditorPane extends JTextArea {
     }
 
     private void updateTabTitle() {
-        // 更新标签标题（例如添加*号标识未保存）
-        javax.swing.JTabbedPane pane = (javax.swing.JTabbedPane) getParent().getParent().getParent();
-        int index = pane.indexOfComponent(getParent().getParent());
-        String title = pane.getTitleAt(index);
-
-        if (!title.startsWith("*")) {
-            pane.setTitleAt(index, "*" + title);
+        try {
+            javax.swing.JTabbedPane pane = (javax.swing.JTabbedPane) getParent().getParent().getParent();
+            int index = pane.indexOfComponent(getParent().getParent());
+            String title = pane.getTitleAt(index);
+    
+            if (isModified && !title.startsWith("*")) {
+                pane.setTitleAt(index, "*" + title);
+            } else if (!isModified && title.startsWith("*")) {
+                pane.setTitleAt(index, title.substring(1));
+            }
+        } catch (Exception e) {
+            // 组件可能尚未添加到UI层次结构中
         }
     }
 }

@@ -33,10 +33,18 @@ public class MenuManager {
         // 新建菜单项
         addMenuItem(fileMenu, "新建", KeyEvent.VK_N,
                 e -> frame.getTabManager().addNewTab("未命名"));
+                
+        // 打开菜单项
+        addMenuItem(fileMenu, "打开", KeyEvent.VK_O,
+                e -> FileController.openFile(getCurrentEditor(), frame));
 
         // 保存菜单项
         addMenuItem(fileMenu, "保存", KeyEvent.VK_S,
                 e -> FileController.saveFile(getCurrentEditor(), frame));
+                
+        // 另存为菜单项
+        addMenuItem(fileMenu, "另存为...", KeyEvent.VK_A,
+                e -> FileController.saveAsFile(getCurrentEditor(), frame));
 
         menuBar.add(fileMenu);
     }
