@@ -2,6 +2,8 @@ package com.notepad.core;
 
 import com.notepad.view.EditorPane;
 import com.notepad.view.MainFrame;
+import com.notepad.util.SearchDialog;  // 更新引用路径
+
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -17,6 +19,7 @@ import java.awt.event.KeyEvent;
 public class MenuManager {
     private final JMenuBar menuBar = new JMenuBar();
     private final MainFrame frame;
+    private SearchDialog searchDialog;
 
     public MenuManager(MainFrame frame) {
         this.frame = frame;
@@ -81,7 +84,33 @@ public class MenuManager {
                     }
                 });
                 
+        editMenu.addSeparator();
+        
+        // 添加搜索功能
+        addMenuItem(editMenu, "查找", KeyEvent.VK_F,
+                e -> {
+                    EditorPane editor = getCurrentEditor();
+                    if (editor != null) {
+                        showSearchDialog(editor);
+                    }
+                });
+                
         menuBar.add(editMenu);
+    }
+    
+    /**
+     * 显示搜索对话框
+     * @param editor 当前活动的编辑器
+     */
+    private void showSearchDialog(EditorPane editor) {
+        if (searchDialog == null) {
+            searchDialog = new SearchDialog(frame, editor);
+        } else {
+            // 更新对话框关联的编辑器，因为可能切换了标签页
+            searchDialog.dispose();
+            searchDialog = new SearchDialog(frame, editor);
+        }
+        searchDialog.showDialog();
     }
 
     private EditorPane getCurrentEditor() {
