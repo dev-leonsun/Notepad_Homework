@@ -2,7 +2,7 @@ package com.notepad.core;
 
 import com.notepad.view.EditorPane;
 import com.notepad.view.MainFrame;
-import com.notepad.util.SearchDialog;  // 更新引用路径
+import com.notepad.util.SearchDialog;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -20,6 +20,7 @@ public class MenuManager {
     private final JMenuBar menuBar = new JMenuBar();
     private final MainFrame frame;
     private SearchDialog searchDialog;
+    private SearchDialog replaceDialog;
 
     public MenuManager(MainFrame frame) {
         this.frame = frame;
@@ -95,6 +96,15 @@ public class MenuManager {
                     }
                 });
                 
+        // 添加替换功能
+        addMenuItem(editMenu, "替换", KeyEvent.VK_H,
+                e -> {
+                    EditorPane editor = getCurrentEditor();
+                    if (editor != null) {
+                        showReplaceDialog(editor);
+                    }
+                });
+                
         menuBar.add(editMenu);
     }
     
@@ -104,13 +114,28 @@ public class MenuManager {
      */
     private void showSearchDialog(EditorPane editor) {
         if (searchDialog == null) {
-            searchDialog = new SearchDialog(frame, editor);
+            searchDialog = new SearchDialog(frame, editor, false);
         } else {
             // 更新对话框关联的编辑器，因为可能切换了标签页
             searchDialog.dispose();
-            searchDialog = new SearchDialog(frame, editor);
+            searchDialog = new SearchDialog(frame, editor, false);
         }
         searchDialog.showDialog();
+    }
+    
+    /**
+     * 显示替换对话框
+     * @param editor 当前活动的编辑器
+     */
+    private void showReplaceDialog(EditorPane editor) {
+        if (replaceDialog == null) {
+            replaceDialog = new SearchDialog(frame, editor, true);
+        } else {
+            // 更新对话框关联的编辑器，因为可能切换了标签页
+            replaceDialog.dispose();
+            replaceDialog = new SearchDialog(frame, editor, true);
+        }
+        replaceDialog.showDialog();
     }
 
     private EditorPane getCurrentEditor() {

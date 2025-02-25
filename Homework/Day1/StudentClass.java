@@ -2,7 +2,7 @@ package Homework.Day1;
 
 import java.time.LocalDate;
 /**
- *Day1 Homework;
+ * Day1 Homework;
  * @author 2023215346
  * @version 1.0
  * @date 2025/2/25
